@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework.Constraints;
 
 namespace csharp
@@ -17,45 +18,23 @@ namespace csharp
             Items = items;
         }
 
-        public bool QualityLessThan50(Item item)
-        {
-            return item.Quality < 50;
-        }
-
         public int QualityMinus1(Item item)
         {
             return item.Quality = item.Quality - 1;
         }
 
-        public int AgedBrieQuality(Item item)
+        public void ImproveQuality(Item item)
         {
-            if (QualityLessThan50(item))
-            {
-                return item.Quality++;
-            }
-
-            return item.Quality;
+            item.Quality = Math.Min(50, item.Quality + 1);
         }
 
-        public int BackstagePassesQuality(Item item)
+        public void BackstagePassesQuality(Item item)
         {
+            ImproveQuality(item);
             if (item.SellIn < 11)
             {
-                if (QualityLessThan50(item))
-                {
-                    return item.Quality++;
-                }
+                ImproveQuality(item);
             }
-
-            if (item.SellIn < 6)
-            {
-                if (QualityLessThan50(item))
-                {
-                    return item.Quality++;
-                }
-            }
-
-            return item.Quality;
         }
 
         public void SellInItemsBelow0(Item item)
@@ -63,7 +42,7 @@ namespace csharp
             switch (item.Name)
             {
                 case AgedBrie:
-                    AgedBrieQuality(item);
+                    ImproveQuality(item);
                     break;
                 case BackstagePasses:
                     item.Quality = 0;
@@ -79,20 +58,17 @@ namespace csharp
                     break;
             }
         }
-
-
         public void UpdateQuality()
         {
             for (var i = 0; i < Items.Count; i++)
             {
                 if (Items[i].Name == AgedBrie)
                 {
-                    AgedBrieQuality(Items[i]);
+                    ImproveQuality(Items[i]);
                 }
 
                 if (Items[i].Name == BackstagePasses)
                 {
-                    AgedBrieQuality(Items[i]);
                     BackstagePassesQuality(Items[i]);
                 }
 
