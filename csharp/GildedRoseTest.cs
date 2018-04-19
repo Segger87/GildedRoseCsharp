@@ -13,7 +13,6 @@ namespace csharp
             GildedRose app = new GildedRose(Items);
             app.UpdateQuality();
             Assert.AreEqual("foo", Items[0].Name);
-            Assert.AreEqual(0, Items[0].SellIn);
         }
     }
 }

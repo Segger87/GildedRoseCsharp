@@ -5,10 +5,16 @@ namespace csharp
 {
     public class GildedRose
     {
+        public const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
+        public const string AgedBrie = "Aged Brie";
+        public const string SulfurasHandOfRagnaros = "Sulfuras, Hand of Ragnaros";
+        public const string ConjouredRabbit = "Conjoured rabbit";
+
         IList<Item> Items;
-        public GildedRose(IList<Item> Items)
+
+        public GildedRose(IList<Item> items)
         {
-            this.Items = Items;
+            Items = items;
         }
 
         public bool QualityLessThan50(Item item)
@@ -20,14 +26,24 @@ namespace csharp
         {
             return item.Quality = item.Quality - 1;
         }
-        public int BackstagePasses(Item item)
+
+        public int AgedBrieQuality(Item item)
+        {
+            if (QualityLessThan50(item))
+            {
+                return item.Quality++;
+            }
+
+            return item.Quality;
+        }
+
+        public int BackstagePassesQuality(Item item)
         {
             if (item.SellIn < 11)
             {
                 if (QualityLessThan50(item))
                 {
-                    item.Quality = item.Quality + 1;
-                    return item.Quality;
+                    return item.Quality++;
                 }
             }
 
@@ -35,12 +51,33 @@ namespace csharp
             {
                 if (QualityLessThan50(item))
                 {
-                    item.Quality = item.Quality + 1;
-                    return item.Quality;
+                    return item.Quality++;
                 }
             }
 
             return item.Quality;
+        }
+
+        public void SellInItemsBelow0(Item item)
+        {
+            switch (item.Name)
+            {
+                case AgedBrie:
+                    AgedBrieQuality(item);
+                    break;
+                case BackstagePasses:
+                    item.Quality = 0;
+                    break;
+                case SulfurasHandOfRagnaros:
+                    // Do nothing
+                    break;
+                default:
+                    if (item.Quality > 0)
+                    {
+                        QualityMinus1(item);
+                    }
+                    break;
+            }
         }
 
 
@@ -48,57 +85,36 @@ namespace csharp
         {
             for (var i = 0; i < Items.Count; i++)
             {
-                if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+                if (Items[i].Name == AgedBrie)
+                {
+                    AgedBrieQuality(Items[i]);
+                }
+
+                if (Items[i].Name == BackstagePasses)
+                {
+                    AgedBrieQuality(Items[i]);
+                    BackstagePassesQuality(Items[i]);
+                }
+
+                if (Items[i].Name != AgedBrie && Items[i].Name != BackstagePasses)
                 {
                     if (Items[i].Quality > 0)
                     {
-                        if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
+                        if (Items[i].Name != SulfurasHandOfRagnaros)
                         {
                             QualityMinus1(Items[i]);
                         }
                     }
                 }
-                else
-                {
-                    if (QualityLessThan50(Items[i]))
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
 
-                        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            BackstagePasses(Items[i]);
-                        }
-                    }
-                }
-
-                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
+                if (Items[i].Name != SulfurasHandOfRagnaros)
                 {
-                    Items[i].SellIn = Items[i].SellIn - 1;
+                    Items[i].SellIn--;
                 }
 
                 if (Items[i].SellIn < 0)
                 {
-                    switch (Items[i].Name)
-                    {
-                        case "Aged Brie":
-                            if (QualityLessThan50(Items[i]))
-                            {
-                                Items[i].Quality++;
-                            }
-                            break;
-                        case "Backstage passes to a TAFKAL80ETC concert":
-                            Items[i].Quality = 0;
-                            break;
-                        case "Sulfuras, Hand of Ragnaros":
-                            // Do nothing
-                            break;
-                        default:
-                            if (Items[i].Quality > 0)
-                            {
-                                QualityMinus1(Items[i]);
-                            }
-                            break;
-                    }
+                    SellInItemsBelow0(Items[i]);
                 }
             }
         }
