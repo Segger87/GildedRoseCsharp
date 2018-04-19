@@ -9,7 +9,7 @@ namespace csharp
         public const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
         public const string AgedBrie = "Aged Brie";
         public const string SulfurasHandOfRagnaros = "Sulfuras, Hand of Ragnaros";
-        public const string ConjouredRabbit = "Conjoured rabbit";
+        public const string ConjouredCake = "Conjured Mana Cake";
 
         IList<Item> Items;
 
@@ -21,6 +21,10 @@ namespace csharp
         public int QualityMinus1(Item item)
         {
             return item.Quality = item.Quality - 1;
+        }
+        public void QualityConjoured(Item item)
+        {
+            item.Quality = Math.Max(0, item.Quality - 2);
         }
 
         public void ImproveQuality(Item item)
@@ -46,6 +50,9 @@ namespace csharp
                     break;
                 case BackstagePasses:
                     item.Quality = 0;
+                    break;
+                case ConjouredCake:
+                    QualityConjoured(item);
                     break;
                 case SulfurasHandOfRagnaros:
                     // Do nothing
